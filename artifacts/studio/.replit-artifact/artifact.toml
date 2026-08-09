@@ -1,0 +1,28 @@
+kind = "web"
+previewPath = "/"
+title = "Personal Dev Studio"
+description = "Personal AI Development Studio — IDE berbasis browser yang berjalan lokal. Fitur: Monaco Editor, terminal nyata (node-pty + xterm.js), file explorer, preview proxy, AI agent untuk coding & debugging, git integration (status/diff/commit/push), secret manager terenkripsi, dan checkpoint/rollback. Dirancang untuk satu pengguna, satu proyek aktif, tanpa cloud."
+version = "1.0.0"
+id = "artifacts/studio"
+router = "path"
+
+[[services]]
+name = "web"
+paths = [ "/" ]
+localPort = 18425
+
+[services.development]
+run = "pnpm --filter @workspace/studio run dev"
+
+[services.production]
+build = [ "pnpm", "--filter", "@workspace/studio", "run", "build" ]
+serve = "static"
+publicDir = "artifacts/studio/dist/public"
+
+[[services.production.rewrites]]
+from = "/*"
+to = "/index.html"
+
+[services.env]
+PORT = "18425"
+BASE_PATH = "/"

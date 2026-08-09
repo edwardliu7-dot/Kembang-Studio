@@ -1,0 +1,3 @@
+- [Orval zod.int() fix](orval-zod-int-fix.md) — Orval 8.23.0 generates Zod v4 syntax for nullable number fields; fix via sed post-process in codegen script.
+- [SQLite backend pattern](sqlite-backend.md) — This project uses SQLite (better-sqlite3) directly in api-server, NOT lib/db (PostgreSQL). Native rebuild needed after install.
+- [Auth init order](auth-init-order.md) — Default password must be set synchronously (bcrypt.hashSync) in app startup before any route handlers run; async hash causes race on first request.
