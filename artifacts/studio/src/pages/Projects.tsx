@@ -1,11 +1,14 @@
 import { useState } from 'react';
 import { useLocation } from 'wouter';
+import { useQueryClient } from '@tanstack/react-query';
 import { 
   useListProjects, 
   useGetStudioStats,
   useCreateProject,
   useOpenProject,
   useLogout,
+  getGetActiveProjectQueryKey,
+  getListProjectsQueryKey,
   Project
 } from '@workspace/api-client-react';
 import { Button } from '@/components/ui/button';
@@ -35,6 +38,7 @@ import { Skeleton } from '@/components/ui/skeleton';
 
 export default function Projects() {
   const [, setLocation] = useLocation();
+  const queryClient = useQueryClient();
   const { data: stats, isLoading: statsLoading } = useGetStudioStats();
   const { data: projects, isLoading: projectsLoading } = useListProjects();
   
@@ -42,7 +46,15 @@ export default function Projects() {
   
   const handleOpenProject = (id: number) => {
     openProject.mutate({ id }, {
-      onSuccess: () => {
+      onSuccess: (project) => {
+        // Pre-populate the active project cache so Studio.tsx doesn't
+        // see stale data (hasActive: false) and immediately redirect back.
+        queryClient.setQueryData(getGetActiveProjectQueryKey(), {
+          hasActive: true,
+          project,
+        });
+        // Also invalidate projects list so it refreshes in the background.
+        queryClient.invalidateQueries({ queryKey: getListProjectsQueryKey() });
         setLocation('/studio');
       }
     });
